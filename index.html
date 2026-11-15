@@ -153,12 +153,14 @@ button,.quick,.album,.artist,.pill,.round,.navitem{
 .np-meta{text-align:left;margin:20px 0 14px}
 .np-meta strong,.np-meta span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .np-meta strong{font-size:21px;letter-spacing:-.5px}.np-meta span{color:#b0b2bd;font-size:13px;margin-top:5px}
-.yt-embed-wrap{width:200px;height:200px;margin:12px auto 8px;border-radius:14px;overflow:hidden;background:#000;border:1px solid #ffffff22}
-#ytplayer,#ytplayer iframe{width:200px!important;height:200px!important;display:block}
+.yt-embed-wrap{width:min(100%,320px);aspect-ratio:16/9;height:auto;margin:12px auto 8px;border-radius:14px;overflow:hidden;background:#000;border:1px solid #ffffff22;box-shadow:0 12px 34px #0008}
+#ytplayer,#ytplayer iframe{width:320px!important;height:180px!important;max-width:100%;display:block}
 .np-controls{display:flex;justify-content:center;align-items:center;gap:32px;margin:16px 0}
 .np-controls button{border:0;background:none;color:#fff;font-size:23px;padding:8px}
 .np-controls .np-main-toggle{width:54px;height:54px;border-radius:50%;background:#f5f5f7;color:#101116;font-size:22px}
 .np-note{font-size:10px;color:#8f93a0;line-height:1.5;max-width:340px;margin:10px auto}
+.now-playing{isolation:isolate;background:rgba(5,6,10,.74)}
+.now-playing:before{content:"";position:fixed;inset:-35px;z-index:-1;background-image:var(--np-bg);background-size:cover;background-position:center;filter:blur(38px) brightness(.28) saturate(1.35);transform:scale(1.12);opacity:.9}
 @media(min-width:760px){.now-playing{padding-top:18px}.np-content{margin-top:8px}.np-artwork{width:220px}.np-meta{margin:12px 0}.yt-embed-wrap{margin:8px auto}}
 
 </style></head>
@@ -237,8 +239,13 @@ function openArtist(name){
  navigate('Artist');loadArtistTracks(a.name);
 }
 async function loadArtistTracks(name){
- const box=$('#artistTracks');try{const d=await apiSearch(name+' official songs');const items=(d.items||[]).filter(x=>x.id?.videoId);box.innerHTML=items.length?items.map(trackMarkup).join(''):'<div class="empty-state">Belum ada hasil lagu untuk artis ini.</div>';bindTrackRows(box);
- $('#artistRelated').innerHTML=items.slice(0,5).map((x,i)=>`<article class="album" onclick="play('${esc(x.id.videoId)}','${esc(x.snippet.title)}','${esc(x.snippet.channelTitle)}','${esc(x.snippet.thumbnails?.medium?.url||'')}')"><img src="${esc(x.snippet.thumbnails?.medium?.url||'')}" alt=""><strong>${esc(x.snippet.title)}</strong><span>${esc(x.snippet.channelTitle)}</span></article>`).join('');
+ const box=$('#artistTracks');
+ try{
+  const d=await apiSearch(name+' official music video',name);
+  const items=(d.items||[]).filter(x=>x.id?.videoId);
+  box.innerHTML=items.length?items.map(trackMarkup).join(''):'<div class="empty-state">Belum ditemukan video yang cocok untuk '+esc(name)+'. Coba pencarian manual.</div>';
+  bindTrackRows(box);
+  $('#artistRelated').innerHTML=items.slice(0,5).map(x=>`<article class="album" onclick="play('${esc(x.id.videoId)}','${esc(x.snippet.title)}','${esc(x.snippet.channelTitle)}','${esc(x.snippet.thumbnails?.medium?.url||'')}')"><img src="${esc(x.snippet.thumbnails?.medium?.url||'')}" alt=""><strong>${esc(x.snippet.title)}</strong><span>${esc(x.snippet.channelTitle)}</span></article>`).join('');
  }catch(e){box.innerHTML=`<div class="empty-state">Tidak dapat memuat katalog. ${esc(e.message)}</div>`}
 }
 function openPlaylist(name){
@@ -249,7 +256,7 @@ function openPlaylist(name){
 async function loadPlaylistTracks(p){const box=$('#playlistTracks');try{const results=await Promise.all(p.artists.map(n=>apiSearch(n+' best songs')));let items=results.flatMap(d=>d.items||[]).filter(x=>x.id?.videoId).slice(0,18);box.innerHTML=items.length?items.map(trackMarkup).join(''):'<div class="empty-state">Belum ada lagu dalam playlist ini.</div>';bindTrackRows(box)}catch(e){box.innerHTML=`<div class="empty-state">Katalog belum bisa dimuat: ${esc(e.message)}</div>`}}
 function trackMarkup(x){const s=x.snippet||{},id=x.id?.videoId,img=s.thumbnails?.medium?.url||s.thumbnails?.default?.url||'';return `<div class="track-row" data-id="${esc(id)}" data-title="${esc(s.title)}" data-artist="${esc(s.channelTitle)}" data-img="${esc(img)}"><img src="${esc(img)}" alt=""><div class="track-info"><strong>${esc(s.title)}</strong><span>${esc(s.channelTitle)}</span></div><button class="like-btn" title="Sukai lagu" data-like="1">♡</button><span class="track-play">▶</span></div>`}
 function bindTrackRows(root){root.querySelectorAll('.track-row').forEach(row=>{row.addEventListener('click',e=>{if(e.target.closest('[data-like]')){e.stopPropagation();toggleLike(row.dataset.id,row.dataset.title,row.dataset.artist,row.dataset.img,e.target);return}play(row.dataset.id,row.dataset.title,row.dataset.artist,row.dataset.img)});const liked=getLiked().some(x=>x.id===row.dataset.id);row.querySelector('[data-like]').textContent=liked?'♥':'♡'})}
-async function apiSearch(q){const u=new URL('/api/search',location.origin);u.searchParams.set('q',q);const r=await fetch(u);const d=await r.json();if(!r.ok)throw Error(d.error||'Pencarian gagal');return d}
+async function apiSearch(q,artist=''){const u=new URL('/api/search',location.origin);u.searchParams.set('q',q);if(artist)u.searchParams.set('artist',artist);const r=await fetch(u);const d=await r.json();if(!r.ok)throw Error(d.error||'Pencarian gagal');return d}
 async function search(q){if(!q.trim())return;$('#status').textContent='Mencari musik…';$('#results').innerHTML='';try{const d=await apiSearch(q);searchCache=d.items||[];$('#results').innerHTML=searchCache.length?searchCache.map(trackMarkup).join(''):'<div class="empty-state">Tidak ada hasil. Coba kata kunci lain.</div>';bindTrackRows($('#results'));$('#status').textContent=`${searchCache.length} hasil ditemukan.`}catch(e){$('#status').textContent='Gagal: '+e.message;$('#results').innerHTML='<div class="empty-state">Periksa konfigurasi katalog musik di Vercel.</div>'}}
 function renderHome(){
  $('#quick').innerHTML=quickSeeds.map(([artist,song])=>{const a=artists.find(x=>x.name===artist);return `<article class="quick" onclick="openArtist('${esc(artist)}')"><img class="cover" src="${esc(a?.img||'')}" alt=""><div style="min-width:0"><div class="qtitle">${esc(song)}</div><div class="qartist">${esc(artist)}</div></div></article>`}).join('');
@@ -265,10 +272,10 @@ function removeLike(id){setLiked(getLiked().filter(x=>x.id!==id));renderLiked();
 function getSavedArtists(){try{return JSON.parse(localStorage.getItem('wilify-artists')||'[]')}catch{return []}}
 function saveArtist(name){const a=getSavedArtists();if(!a.includes(name)){a.push(name);localStorage.setItem('wilify-artists',JSON.stringify(a));toast(name+' disimpan ke Library')}else toast('Artis sudah ada di Library')}
 function renderLibrary(){const saved=getSavedArtists();const savedArtists=artists.filter(a=>saved.includes(a.name));const html=[...playlists.map(p=>`<article class="library-card" onclick="openPlaylist('${esc(p.name)}')"><img src="${esc(p.img)}"><strong>${esc(p.name)}</strong><span class="page-sub">Playlist</span></article>`),...savedArtists.map(a=>`<article class="library-card" onclick="openArtist('${esc(a.name)}')"><img src="${esc(a.img)}"><strong>${esc(a.name)}</strong><span class="page-sub">Artis tersimpan</span></article>`)];$('#libraryItems').innerHTML=html.length?html.join(''):'<div class="empty-state">Library masih kosong.</div>'}
-function playArtistTop(name){apiSearch(name+' popular song').then(d=>{const x=(d.items||[]).find(v=>v.id?.videoId);if(x)play(x.id.videoId,x.snippet.title,x.snippet.channelTitle,x.snippet.thumbnails?.medium?.url||'');else toast('Lagu belum ditemukan')}).catch(()=>toast('Katalog belum tersedia'))}
+function playArtistTop(name){apiSearch(name+' official music video',name).then(d=>{const x=(d.items||[]).find(v=>v.id?.videoId);if(x)play(x.id.videoId,x.snippet.title,x.snippet.channelTitle,x.snippet.thumbnails?.high?.url||x.snippet.thumbnails?.medium?.url||'');else toast('Tidak ada video yang cocok untuk '+name)}).catch(e=>toast('Katalog gagal: '+e.message))}
 function playPlaylist(name){const p=playlists.find(x=>x.name===name);if(p)playArtistTop(p.artists[0])}
 let currentTrack=null, queue=[], queueIndex=-1, playerReady=false, playerGeneration=0;
-function updatePlayerButtons(state){const playing=state===1;$('#miniToggle').textContent=playing?'Ⅱ':'▶';$('#npToggle').textContent=playing?'Ⅱ':'▶'}
+function updatePlayerButtons(state){const playing=state===1;$('#miniToggle').textContent=playing?'Ⅱ':'▶';$('#npToggle').textContent=playing?'Ⅱ':'▶';if('mediaSession' in navigator){try{navigator.mediaSession.playbackState=playing?'playing':(state===2?'paused':'none')}catch(e){}}}
 function openNowPlaying(){if(!currentTrack)return;$('#nowPlaying').classList.add('open');$('#nowPlaying').setAttribute('aria-hidden','false')}
 function hideNowPlaying(){$('#nowPlaying').classList.remove('open');$('#nowPlaying').setAttribute('aria-hidden','true')}
 function closeNowPlaying(){stopPlayback()}
@@ -282,7 +289,7 @@ function play(id,title,artist,img){
  if(!queue.some(x=>x.id===id)){queue=[track];queueIndex=0}else queueIndex=queue.findIndex(x=>x.id===id);
  currentTrack=track;pending=id;
  $('#miniTitle').textContent=title;$('#miniArtist').textContent=artist;$('#miniImg').src=img||'';
- $('#npTitle').textContent=title;$('#npArtist').textContent=artist;$('#npArtwork').src=img||'';
+ $('#npTitle').textContent=title;$('#npArtist').textContent=artist;$('#npArtwork').src=img||'';$('#nowPlaying').style.setProperty('--np-bg',img?'url(\"'+img+'\")':'none');
  $('#playerbar').classList.add('show');openNowPlaying();setMediaMetadata(track);
  if(ytReady){if(ytPlayer&&playerReady)ytPlayer.loadVideoById({videoId:id});else createPlayer()}
 }
@@ -290,7 +297,7 @@ function createPlayer(){
  if(!pending||!ytReady||!window.YT?.Player)return;
  if(ytPlayer){try{ytPlayer.destroy()}catch(e){}ytPlayer=null;playerReady=false}
  const generation=++playerGeneration;
- ytPlayer=new YT.Player('ytplayer',{width:'200',height:'200',videoId:pending,playerVars:{playsinline:1,rel:0,controls:1,fs:0,modestbranding:1,origin:location.origin},events:{
+ ytPlayer=new YT.Player('ytplayer',{width:'320',height:'180',videoId:pending,playerVars:{playsinline:1,rel:0,controls:1,fs:0,modestbranding:1,iv_load_policy:3,origin:location.origin},events:{
  onReady:e=>{if(generation!==playerGeneration)return;playerReady=true;e.target.playVideo()},
  onStateChange:e=>{if(generation!==playerGeneration)return;updatePlayerButtons(e.data);if(e.data===0)playQueue(1)},
  onError:()=>toast('Video tidak dapat diputar. Coba lagu lain.')
