@@ -163,169 +163,187 @@ button,.quick,.album,.artist,.pill,.round,.navitem{
 .now-playing:before{content:"";position:fixed;inset:-35px;z-index:-1;background-image:var(--np-bg);background-size:cover;background-position:center;filter:blur(38px) brightness(.28) saturate(1.35);transform:scale(1.12);opacity:.9}
 @media(min-width:760px){.now-playing{padding-top:18px}.np-content{margin-top:8px}.np-artwork{width:220px}.np-meta{margin:12px 0}.yt-embed-wrap{margin:8px auto}}
 
-</style></head>
-<body>
+
+/* === Wilify v2: sidebar, player penuh, skeleton === */
+body{padding-bottom:150px;overflow-x:hidden}.shell{overflow-x:clip}
+.sidebar{display:none}
+.track-row.playing strong{color:var(--purple)}
+.skel{height:56px;border-radius:13px;background:linear-gradient(90deg,#1b1e27,#262a36,#1b1e27);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.err{border-color:#ff6b7a55;color:#ffb3bb}.retry{margin-top:10px;border:0;border-radius:20px;padding:9px 16px;background:#fff;color:#111;font-weight:800}
+.more{display:block;margin:14px auto;border:1px solid #ffffff26;background:#ffffff14;color:#fff;border-radius:22px;padding:10px 20px;font-weight:700}
+.mini-prog{position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:2px;background:#ffffff1f;z-index:2}.mini-prog i{display:block;height:100%;width:0;background:var(--purple);border-radius:2px}
+.playerbar .ctl{width:34px;height:34px;border-radius:50%;background:none;border:0;color:#fff;position:relative;z-index:2}
+.np-seek{display:flex;align-items:center;gap:9px;font-size:11px;color:#b0b2bd}.np-seek input{flex:1}
+input[type=range]{accent-color:var(--purple);width:100%}
+.np-controls{gap:20px}.np-controls .on{color:var(--purple)}
+.np-vol{display:flex;gap:10px;align-items:center;color:#b0b2bd;margin:6px 0 14px}
+.queue{text-align:left;margin-top:14px}.queue h3{font-size:14px;margin:0 0 8px}
+.yt-embed-wrap{width:min(100%,240px);margin:8px auto}#ytplayer,#ytplayer iframe{width:240px!important;height:135px!important}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+@media(min-width:900px){
+ .sidebar{display:flex;flex-direction:column;gap:4px;position:fixed;z-index:16;left:14px;top:14px;bottom:14px;width:210px;padding:18px 12px;border-radius:24px;background:linear-gradient(145deg,rgba(58,61,73,.5),rgba(23,25,34,.7));border:1px solid var(--glass-line);backdrop-filter:blur(30px) saturate(1.6)}
+ .sidebar .logo{font-size:34px;margin:0 0 14px 8px;border:0;background:none;color:#fff;text-align:left;padding:0}
+ .sidebar .navitem{flex-direction:row;gap:12px;padding:12px;font-size:14px;justify-content:flex-start}
+ .shell{margin-left:240px;max-width:none}.bottom{display:none}
+ .playerbar{left:240px;right:20px;max-width:none;margin:0}body{padding-bottom:110px}
+ .hero{min-height:230px}
+}
+</style></head><body>
+<aside class="sidebar" id="side"></aside>
 <div class="shell">
-<header class="hero" id="homeHero"><div class="topline"><button class="logo" onclick="navigate('Home')" style="border:0;background:none;color:white;padding:0">Wili<span>fy</span></button><div class="top-actions"><button class="round" aria-label="Cari" onclick="navigate('Search')">⌕</button><button class="round" aria-label="Profil" onclick="navigate('Profile')">♙</button></div></div><div class="hero-copy"><div class="eyebrow">YOUR SOUND · YOUR SPACE</div><h1>Temukan soundtrack harimu.</h1><p>Musik yang pas, kapan pun kamu membutuhkannya.</p></div></header>
-<nav class="pills" id="categoryPills"><button class="pill active" data-category="Semua">Semua</button><button class="pill" data-category="Indo Pop">Indo Pop</button><button class="pill" data-category="Chill">Chill</button><button class="pill" data-category="Indie">Indie</button><button class="pill" data-category="Nostalgia">Nostalgia</button></nav>
-<main id="appView">
-<section class="view active" id="view-Home">
-<div class="status" style="margin:0 0 16px">Wilify · Your sound, your space</div>
-<section class="section"><div class="section-head"><h2>⚡ Quick Picks</h2><a href="#" onclick="navigate('Search');return false">Cari musik ↗</a></div><div class="quick-grid" id="quick"></div></section>
-<section class="section"><div class="section-head"><h2>◉ Popular Playlists</h2><a href="#" onclick="navigate('Library');return false">Lihat semua</a></div><div class="rail" id="playlists"></div></section>
-<section class="section"><div class="section-head"><h2>♧ Top Artists</h2><a href="#" onclick="navigate('Artists');return false">Jelajahi</a></div><div class="rail" id="artists"></div></section>
-</section>
-<section class="view" id="view-Artist"></section>
-<section class="view" id="view-Playlist"></section>
-<section class="view" id="view-Artists"><div class="page-head"><div><h1 class="page-title">Top Artists</h1><p class="page-sub">Jelajahi musisi pilihan Wilify</p></div></div><div class="artist-grid" id="allArtists"></div></section>
-<section class="view" id="view-Search"><div class="page-head"><div><h1 class="page-title">Search</h1><p class="page-sub">Temukan lagu, artis, dan album favoritmu.</p></div></div><div class="search-panel"><input id="searchInput" placeholder="Apa yang ingin kamu dengarkan?" enterkeyhint="search"><button id="searchBtn">Cari</button></div><div class="status" id="status">Ketik nama lagu atau artis untuk mulai mencari.</div><div class="search-results" id="results"><div class="empty-state">Cari musik Indonesia dan temukan sesuatu yang baru.</div></div></section>
-<section class="view" id="view-Library"><div class="page-head"><div><h1 class="page-title">Your Library</h1><p class="page-sub">Koleksi yang kamu simpan di perangkat ini.</p></div></div><div class="library-grid" id="libraryItems"></div></section>
-<section class="view" id="view-Liked"><div class="page-head"><div><h1 class="page-title">Liked Songs</h1><p class="page-sub">Semua lagu yang kamu sukai.</p></div></div><div class="track-list" id="likedItems"></div></section>
-<section class="view" id="view-Offline"><div class="page-head"><div><h1 class="page-title">Offline</h1><p class="page-sub">Musik yang tersedia tanpa koneksi.</p></div></div><div class="empty-state">Mode offline untuk audio streaming belum tersedia. Wilify tidak mengunduh atau menyimpan audio YouTube. Kamu tetap bisa menyimpan daftar lagu di Library.</div></section>
-<section class="view" id="view-Profile"><div class="page-head"><div><h1 class="page-title">Profile</h1><p class="page-sub">Ruang musik pribadimu.</p></div></div><div class="profile-card"><div class="profile-avatar">W</div><h2>Wilify Listener</h2><p style="color:#c2c1cd;font-size:13px">Selamat datang di Wilify. Simpan lagu favorit dan bangun koleksi musikmu.</p><button class="action-glass" onclick="navigate('Liked')">Lihat lagu disukai</button></div></section>
-<section class="view" id="view-Category"></section>
-</main><footer>Wilify · Your sound, your space</footer></div>
-<div class="playerbar" id="playerbar" role="group" aria-label="Mini player"><img id="miniImg" alt="Artwork lagu"><div class="now" id="openPlayer" role="button" tabindex="0"><strong id="miniTitle">Now playing</strong><small id="miniArtist"></small></div><button class="playtoggle" id="miniToggle" aria-label="Putar atau jeda">Ⅱ</button><button class="mini-close" id="miniStop" aria-label="Hentikan lagu">✕</button></div>
-<div class="bottom"><button class="navitem active" data-nav="Home" onclick="navigate('Home',this)"><b>⌂</b>Home</button><button class="navitem" data-nav="Search" onclick="navigate('Search',this)"><b>⌕</b>Search</button><button class="navitem" data-nav="Library" onclick="navigate('Library',this)"><b>▥</b>Library</button><button class="navitem" data-nav="Offline" onclick="navigate('Offline',this)"><b>⇩</b>Offline</button><button class="navitem" data-nav="Liked" onclick="navigate('Liked',this)"><b>♡</b>Liked</button><button class="navitem" data-nav="Profile" onclick="navigate('Profile',this)"><b>♙</b>Profile</button></div>
-<div id="toast"></div>
-<section class="now-playing" id="nowPlaying" aria-label="Now playing" aria-hidden="true">
-  <div class="np-top"><button class="np-back" id="closeNowPlaying" aria-label="Tutup dan hentikan pemutar">✕</button><span>NOW PLAYING</span><button class="np-stop" id="stopPlayback" aria-label="Hentikan lagu">✕</button></div>
-  <div class="np-content">
-    <img class="np-artwork" id="npArtwork" alt="Artwork lagu">
-    <div class="np-meta"><strong id="npTitle">Now playing</strong><span id="npArtist"></span></div>
-    <div class="yt-embed-wrap"><div id="ytplayer"></div></div>
-    <div class="np-controls"><button id="npPrev" aria-label="Lagu sebelumnya">⏮</button><button id="npToggle" class="np-main-toggle" aria-label="Jeda atau putar">Ⅱ</button><button id="npNext" aria-label="Lagu berikutnya">⏭</button></div>
-    <p class="np-note">Pemutar YouTube resmi ditampilkan dalam ukuran ringkas. Playback di latar belakang bergantung pada dukungan browser dan kebijakan YouTube.</p>
-  </div>
-</section>
+<header class="hero" id="homeHero"><div class="topline"><button class="logo" onclick="location.hash='#/home'" style="border:0;background:none;color:white;padding:0">Wili<span>fy</span></button><div class="top-actions"><button class="round" aria-label="Cari" onclick="location.hash='#/search'">⌕</button><button class="round" aria-label="Profil" onclick="location.hash='#/profile'">♙</button></div></div><div class="hero-copy"><div class="eyebrow">YOUR SOUND · YOUR SPACE</div><h1>Temukan soundtrack harimu.</h1><p>Musik yang pas, kapan pun kamu membutuhkannya.</p></div></header>
+<main id="page"></main><footer>Wilify · Your sound, your space</footer></div>
+<div class="playerbar" id="playerbar" role="group" aria-label="Mini player"><img id="miniImg" alt=""><div class="now" id="openPlayer" role="button" tabindex="0"><strong id="miniTitle"></strong><small id="miniArtist"></small></div><button class="ctl" id="miniPrev" aria-label="Sebelumnya">⏮</button><button class="playtoggle" id="miniToggle" aria-label="Putar atau jeda">▶</button><button class="ctl" id="miniNext" aria-label="Berikutnya">⏭</button><button class="mini-close" id="miniStop" aria-label="Tutup pemutar">✕</button><div class="mini-prog"><i id="miniProg"></i></div></div>
+<nav class="bottom" id="bnav"></nav><div id="toast"></div>
+<section class="now-playing" id="nowPlaying" aria-hidden="true">
+<div class="np-top"><button id="npClose" aria-label="Kecilkan">⌄</button><span>NOW PLAYING</span><button id="npStop" aria-label="Tutup pemutar">✕</button></div>
+<div class="np-content"><img class="np-artwork" id="npArtwork" alt="">
+<div class="np-meta"><strong id="npTitle"></strong><span id="npArtist"></span></div>
+<div class="np-seek"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="100" value="0" step="0.1" aria-label="Posisi lagu"><span id="tDur">0:00</span></div>
+<div class="np-controls"><button id="npShuffle" aria-label="Shuffle">⇄</button><button id="npPrev" aria-label="Sebelumnya">⏮</button><button id="npToggle" class="np-main-toggle" aria-label="Putar atau jeda">▶</button><button id="npNext" aria-label="Berikutnya">⏭</button><button id="npRepeat" aria-label="Repeat">↻</button></div>
+<div class="np-vol">🔈<input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"></div>
+<div class="yt-embed-wrap"><div id="ytplayer"></div></div>
+<p class="np-note">Sumber audio saat ini: YouTube IFrame Player resmi (ditampilkan ringkas, sesuai ketentuan YouTube). Background playback bergantung pada browser.</p>
+<div class="queue"><h3>Antrean</h3><div class="track-list" id="queueList"></div></div></div></section>
 <script>
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const artists=[
- {name:'Tulus',genre:'Pop',bio:'Penyanyi dan penulis lagu Indonesia dengan karakter vokal hangat dan lirik yang dekat dengan keseharian.',img:'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=900',seed:'Tulus'},
- {name:'Hindia',genre:'Alternative / Indie',bio:'Proyek musik Baskara Putra yang dikenal lewat lirik reflektif dan warna alternative pop Indonesia.',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=900',seed:'Hindia'},
- {name:'Nadin Amizah',genre:'Indie Pop',bio:'Musisi Indonesia dengan pendekatan folk-pop, lirik puitis, dan atmosfer intim.',img:'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900',seed:'Nadin Amizah'},
- {name:'Juicy Luicy',genre:'Pop',bio:'Grup musik pop Indonesia dengan lagu-lagu bernuansa patah hati dan cerita sehari-hari.',img:'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=900',seed:'Juicy Luicy'},
- {name:'Dewa 19',genre:'Rock',bio:'Grup legendaris Indonesia dengan katalog pop-rock yang dikenal lintas generasi.',img:'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=900',seed:'Dewa 19'},
- {name:'Sheila On 7',genre:'Pop Rock',bio:'Band pop-rock asal Yogyakarta dengan deretan lagu yang melekat di pendengar Indonesia.',img:'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=900',seed:'Sheila On 7'}
-];
-const playlists=[
- {name:'Top Indo Pop',desc:'Lagu Indonesia pilihan untuk menemani harimu.',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600',artists:['Tulus','Hindia','Nadin Amizah','Juicy Luicy']},
- {name:'Senja & Sore',desc:'Musik santai untuk perjalanan pulang dan waktu tenang.',img:'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600',artists:['Nadin Amizah','Hindia','Tulus']},
- {name:'Indie Indonesia',desc:'Warna alternatif dari musisi independen Indonesia.',img:'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600',artists:['Hindia','Nadin Amizah']},
- {name:'Throwback',desc:'Lagu lintas generasi yang selalu punya tempat.',img:'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600',artists:['Dewa 19','Sheila On 7']}
-];
-let ytReady=false,ytPlayer=null,pending=null,currentArtist=null,searchCache=[];
-const quickSeeds=[['Tulus','Monokrom'],['Hindia','Evaluasi'],['Nadin Amizah','Bertaut'],['Juicy Luicy','Lantas'],['Dewa 19','Kangen'],['Sheila On 7','Dan']];
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove('show'),1900)}
-function setActiveNav(name){document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.nav===name))}
-function navigate(name,el){
- document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
- const target=$('#view-'+name);if(target)target.classList.add('active');
- if(el?.dataset?.nav)setActiveNav(name);else if(['Home','Search','Library','Offline','Liked','Profile'].includes(name))setActiveNav(name);
- const home=name==='Home';$('#homeHero').style.display=home?'':'none';$('#categoryPills').style.display=home?'':'none';
- window.scrollTo({top:0,behavior:'smooth'});
- if(name==='Library')renderLibrary();if(name==='Liked')renderLiked();
-}
-function openArtist(name){
- const a=artists.find(x=>x.name===name)||{name,genre:'Musisi Indonesia',bio:'Jelajahi lagu dan rilisan dari '+name+'.',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=900',seed:name};
- currentArtist=a;
- const v=$('#view-Artist');
- v.innerHTML=`<div class="page-head"><button class="back-btn" onclick="navigate('Home')">‹</button><div><h1 class="page-title">${esc(a.name)}</h1><p class="page-sub">Artist profile</p></div></div>
- <div class="artist-hero" style="background-image:url('${esc(a.img)}')"><div><div class="eyebrow">ARTIST</div><h1>${esc(a.name)}</h1><p>${esc(a.genre)} · Indonesia</p><div class="artist-actions"><button class="action-primary" onclick="playArtistTop('${esc(a.name)}')">▶ Putar</button><button class="action-glass" onclick="saveArtist('${esc(a.name)}')">＋ Ikuti / Simpan</button></div></div></div>
- <p style="color:#c5c5ce;font-size:13px;line-height:1.7;max-width:680px">${esc(a.bio)}</p>
- <section class="section"><div class="section-head"><h2>Lagu populer</h2><span class="page-sub">Pilihan untuk ${esc(a.name)}</span></div><div class="track-list" id="artistTracks"><div class="empty-state">Memuat lagu ${esc(a.name)}…</div></div></section>
- <section class="section"><div class="section-head"><h2>Rilisan lainnya</h2></div><div class="rail" id="artistRelated"></div></section>`;
- navigate('Artist');loadArtistTracks(a.name);
-}
-async function loadArtistTracks(name){
- const box=$('#artistTracks');
- try{
-  const d=await apiSearch(name+' official music video',name);
-  const items=(d.items||[]).filter(x=>x.id?.videoId);
-  box.innerHTML=items.length?items.map(trackMarkup).join(''):'<div class="empty-state">Belum ditemukan video yang cocok untuk '+esc(name)+'. Coba pencarian manual.</div>';
-  bindTrackRows(box);
-  $('#artistRelated').innerHTML=items.slice(0,5).map(x=>`<article class="album" onclick="play('${esc(x.id.videoId)}','${esc(x.snippet.title)}','${esc(x.snippet.channelTitle)}','${esc(x.snippet.thumbnails?.medium?.url||'')}')"><img src="${esc(x.snippet.thumbnails?.medium?.url||'')}" alt=""><strong>${esc(x.snippet.title)}</strong><span>${esc(x.snippet.channelTitle)}</span></article>`).join('');
- }catch(e){box.innerHTML=`<div class="empty-state">Tidak dapat memuat katalog. ${esc(e.message)}</div>`}
-}
-function openPlaylist(name){
- const p=playlists.find(x=>x.name===name);if(!p)return;
- const v=$('#view-Playlist');v.innerHTML=`<div class="page-head"><button class="back-btn" onclick="navigate('Home')">‹</button><div><h1 class="page-title">Playlist</h1><p class="page-sub">Wilify collection</p></div></div><div class="playlist-hero"><img src="${esc(p.img)}"><div><div class="eyebrow">PLAYLIST</div><h1>${esc(p.name)}</h1><p>${esc(p.desc)}<br>Wilify · ${p.artists.length} artis</p><button class="action-primary" onclick="playPlaylist('${esc(p.name)}')">▶ Putar playlist</button></div></div><div class="track-list" id="playlistTracks"><div class="empty-state">Menyiapkan daftar lagu…</div></div>`;
- navigate('Playlist');loadPlaylistTracks(p);
-}
-async function loadPlaylistTracks(p){const box=$('#playlistTracks');try{const results=await Promise.all(p.artists.map(n=>apiSearch(n+' best songs')));let items=results.flatMap(d=>d.items||[]).filter(x=>x.id?.videoId).slice(0,18);box.innerHTML=items.length?items.map(trackMarkup).join(''):'<div class="empty-state">Belum ada lagu dalam playlist ini.</div>';bindTrackRows(box)}catch(e){box.innerHTML=`<div class="empty-state">Katalog belum bisa dimuat: ${esc(e.message)}</div>`}}
-function trackMarkup(x){const s=x.snippet||{},id=x.id?.videoId,img=s.thumbnails?.medium?.url||s.thumbnails?.default?.url||'';return `<div class="track-row" data-id="${esc(id)}" data-title="${esc(s.title)}" data-artist="${esc(s.channelTitle)}" data-img="${esc(img)}"><img src="${esc(img)}" alt=""><div class="track-info"><strong>${esc(s.title)}</strong><span>${esc(s.channelTitle)}</span></div><button class="like-btn" title="Sukai lagu" data-like="1">♡</button><span class="track-play">▶</span></div>`}
-function bindTrackRows(root){root.querySelectorAll('.track-row').forEach(row=>{row.addEventListener('click',e=>{if(e.target.closest('[data-like]')){e.stopPropagation();toggleLike(row.dataset.id,row.dataset.title,row.dataset.artist,row.dataset.img,e.target);return}play(row.dataset.id,row.dataset.title,row.dataset.artist,row.dataset.img)});const liked=getLiked().some(x=>x.id===row.dataset.id);row.querySelector('[data-like]').textContent=liked?'♥':'♡'})}
-async function apiSearch(q,artist=''){const u=new URL('/api/search',location.origin);u.searchParams.set('q',q);if(artist)u.searchParams.set('artist',artist);const r=await fetch(u);const d=await r.json();if(!r.ok)throw Error(d.error||'Pencarian gagal');return d}
-async function search(q){if(!q.trim())return;$('#status').textContent='Mencari musik…';$('#results').innerHTML='';try{const d=await apiSearch(q);searchCache=d.items||[];$('#results').innerHTML=searchCache.length?searchCache.map(trackMarkup).join(''):'<div class="empty-state">Tidak ada hasil. Coba kata kunci lain.</div>';bindTrackRows($('#results'));$('#status').textContent=`${searchCache.length} hasil ditemukan.`}catch(e){$('#status').textContent='Gagal: '+e.message;$('#results').innerHTML='<div class="empty-state">Periksa konfigurasi katalog musik di Vercel.</div>'}}
-function renderHome(){
- $('#quick').innerHTML=quickSeeds.map(([artist,song])=>{const a=artists.find(x=>x.name===artist);return `<article class="quick" onclick="openArtist('${esc(artist)}')"><img class="cover" src="${esc(a?.img||'')}" alt=""><div style="min-width:0"><div class="qtitle">${esc(song)}</div><div class="qartist">${esc(artist)}</div></div></article>`}).join('');
- $('#playlists').innerHTML=playlists.map(p=>`<article class="album" onclick="openPlaylist('${esc(p.name)}')"><img src="${esc(p.img)}" alt=""><strong>${esc(p.name)}</strong><span>${esc(p.desc)}</span></article>`).join('');
- $('#artists').innerHTML=artists.map(a=>`<article class="artist" onclick="openArtist('${esc(a.name)}')"><img src="${esc(a.img)}" alt=""><strong>${esc(a.name)}</strong></article>`).join('');
- $('#allArtists').innerHTML=artists.map(a=>`<article class="artist-tile" onclick="openArtist('${esc(a.name)}')"><img src="${esc(a.img)}" alt=""><strong>${esc(a.name)}</strong><span class="page-sub">${esc(a.genre)}</span></article>`).join('');
-}
-function getLiked(){try{return JSON.parse(localStorage.getItem('wilify-liked')||'[]')}catch{return []}}
-function setLiked(items){localStorage.setItem('wilify-liked',JSON.stringify(items))}
-function toggleLike(id,title,artist,img,button){let items=getLiked();const i=items.findIndex(x=>x.id===id);if(i>=0){items.splice(i,1);toast('Dihapus dari Liked Songs')}else{items.unshift({id,title,artist,img});toast('Ditambahkan ke Liked Songs')}setLiked(items);if(button)button.textContent=i>=0?'♡':'♥'}
-function renderLiked(){const items=getLiked();$('#likedItems').innerHTML=items.length?items.map(x=>`<div class="track-row" data-id="${esc(x.id)}" data-title="${esc(x.title)}" data-artist="${esc(x.artist)}" data-img="${esc(x.img)}"><img src="${esc(x.img)}"><div class="track-info"><strong>${esc(x.title)}</strong><span>${esc(x.artist)}</span></div><button class="like-btn" onclick="event.stopPropagation();removeLike('${esc(x.id)}')">♥</button><span class="track-play">▶</span></div>`).join(''):'<div class="empty-state">Belum ada lagu yang disukai.<br>Tekan ikon hati pada lagu untuk menyimpannya.</div>';bindTrackRows($('#likedItems'))}
-function removeLike(id){setLiked(getLiked().filter(x=>x.id!==id));renderLiked();toast('Lagu dihapus')}
-function getSavedArtists(){try{return JSON.parse(localStorage.getItem('wilify-artists')||'[]')}catch{return []}}
-function saveArtist(name){const a=getSavedArtists();if(!a.includes(name)){a.push(name);localStorage.setItem('wilify-artists',JSON.stringify(a));toast(name+' disimpan ke Library')}else toast('Artis sudah ada di Library')}
-function renderLibrary(){const saved=getSavedArtists();const savedArtists=artists.filter(a=>saved.includes(a.name));const html=[...playlists.map(p=>`<article class="library-card" onclick="openPlaylist('${esc(p.name)}')"><img src="${esc(p.img)}"><strong>${esc(p.name)}</strong><span class="page-sub">Playlist</span></article>`),...savedArtists.map(a=>`<article class="library-card" onclick="openArtist('${esc(a.name)}')"><img src="${esc(a.img)}"><strong>${esc(a.name)}</strong><span class="page-sub">Artis tersimpan</span></article>`)];$('#libraryItems').innerHTML=html.length?html.join(''):'<div class="empty-state">Library masih kosong.</div>'}
-function playArtistTop(name){apiSearch(name+' official music video',name).then(d=>{const x=(d.items||[]).find(v=>v.id?.videoId);if(x)play(x.id.videoId,x.snippet.title,x.snippet.channelTitle,x.snippet.thumbnails?.high?.url||x.snippet.thumbnails?.medium?.url||'');else toast('Tidak ada video yang cocok untuk '+name)}).catch(e=>toast('Katalog gagal: '+e.message))}
-function playPlaylist(name){const p=playlists.find(x=>x.name===name);if(p)playArtistTop(p.artists[0])}
-let currentTrack=null, queue=[], queueIndex=-1, playerReady=false, playerGeneration=0;
-function updatePlayerButtons(state){const playing=state===1;$('#miniToggle').textContent=playing?'Ⅱ':'▶';$('#npToggle').textContent=playing?'Ⅱ':'▶';if('mediaSession' in navigator){try{navigator.mediaSession.playbackState=playing?'playing':(state===2?'paused':'none')}catch(e){}}}
-function openNowPlaying(){if(!currentTrack)return;$('#nowPlaying').classList.add('open');$('#nowPlaying').setAttribute('aria-hidden','false')}
-function hideNowPlaying(){$('#nowPlaying').classList.remove('open');$('#nowPlaying').setAttribute('aria-hidden','true')}
-function closeNowPlaying(){stopPlayback()}
-function setMediaMetadata(track){
- if(!('mediaSession' in navigator))return;
- try{navigator.mediaSession.metadata=new MediaMetadata({title:track.title,artist:track.artist,album:'Wilify',artwork:track.img?[{src:track.img,sizes:'512x512',type:'image/jpeg'}]:[]});
- navigator.mediaSession.setActionHandler('play',resumePlayback);navigator.mediaSession.setActionHandler('pause',pausePlayback);navigator.mediaSession.setActionHandler('stop',stopPlayback);navigator.mediaSession.setActionHandler('previoustrack',()=>playQueue(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>playQueue(1));}catch(e){}
-}
-function play(id,title,artist,img){
- const track={id,title,artist,img};
- if(!queue.some(x=>x.id===id)){queue=[track];queueIndex=0}else queueIndex=queue.findIndex(x=>x.id===id);
- currentTrack=track;pending=id;
- $('#miniTitle').textContent=title;$('#miniArtist').textContent=artist;$('#miniImg').src=img||'';
- $('#npTitle').textContent=title;$('#npArtist').textContent=artist;$('#npArtwork').src=img||'';$('#nowPlaying').style.setProperty('--np-bg',img?'url(\"'+img+'\")':'none');
- $('#playerbar').classList.add('show');openNowPlaying();setMediaMetadata(track);
- if(ytReady){if(ytPlayer&&playerReady)ytPlayer.loadVideoById({videoId:id});else createPlayer()}
-}
-function createPlayer(){
- if(!pending||!ytReady||!window.YT?.Player)return;
- if(ytPlayer){try{ytPlayer.destroy()}catch(e){}ytPlayer=null;playerReady=false}
- const generation=++playerGeneration;
- ytPlayer=new YT.Player('ytplayer',{width:'320',height:'180',videoId:pending,playerVars:{playsinline:1,rel:0,controls:1,fs:0,modestbranding:1,iv_load_policy:3,origin:location.origin},events:{
- onReady:e=>{if(generation!==playerGeneration)return;playerReady=true;e.target.playVideo()},
- onStateChange:e=>{if(generation!==playerGeneration)return;updatePlayerButtons(e.data);if(e.data===0)playQueue(1)},
- onError:()=>toast('Video tidak dapat diputar. Coba lagu lain.')
- }});
-}
-function pausePlayback(){if(ytPlayer&&playerReady){ytPlayer.pauseVideo();updatePlayerButtons(2)}}
-function resumePlayback(){if(ytPlayer&&playerReady){ytPlayer.playVideo();updatePlayerButtons(1)}else if(currentTrack&&ytReady)createPlayer()}
-function togglePlayback(){if(!ytPlayer||!playerReady){resumePlayback();return}if(ytPlayer.getPlayerState()===1)pausePlayback();else resumePlayback()}
-function stopPlayback(){
- try{if(ytPlayer){ytPlayer.stopVideo();ytPlayer.destroy()}}catch(e){}
- ytPlayer=null;playerReady=false;playerGeneration++;pending=null;currentTrack=null;queue=[];queueIndex=-1;
- $('#playerbar').classList.remove('show');hideNowPlaying();
- $('#miniTitle').textContent='Now playing';$('#miniArtist').textContent='';$('#miniImg').removeAttribute('src');
- $('#npTitle').textContent='Now playing';$('#npArtist').textContent='';$('#npArtwork').removeAttribute('src');$('#ytplayer').innerHTML='';
- if('mediaSession' in navigator){try{navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none';['play','pause','stop','previoustrack','nexttrack'].forEach(a=>navigator.mediaSession.setActionHandler(a,null))}catch(e){}}
- toast('Pemutaran dihentikan');
-}
-function playQueue(direction){if(!queue.length||queueIndex<0)return;const next=queueIndex+direction;if(next<0||next>=queue.length){if(direction>0)stopPlayback();return}queueIndex=next;const t=queue[queueIndex];currentTrack=t;pending=t.id;$('#miniTitle').textContent=t.title;$('#miniArtist').textContent=t.artist;$('#miniImg').src=t.img||'';$('#npTitle').textContent=t.title;$('#npArtist').textContent=t.artist;$('#npArtwork').src=t.img||'';setMediaMetadata(t);if(ytPlayer&&playerReady)ytPlayer.loadVideoById(t.id);else createPlayer()}
-window.onYouTubeIframeAPIReady=()=>{ytReady=true;if(pending)createPlayer()};
-const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';tag.async=true;document.head.appendChild(tag);
-$('#searchBtn').onclick=()=>search($('#searchInput').value);$('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')search(e.target.value)});
-document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-category]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const cat=b.dataset.category;if(cat==='Semua')navigate('Home');else{const v=$('#view-Category');v.innerHTML=`<div class="page-head"><button class="back-btn" onclick="navigate('Home')">‹</button><div><h1 class="page-title">${esc(cat)}</h1><p class="page-sub">Pilihan musik ${esc(cat)} di Wilify</p></div></div><div class="artist-grid">${artists.filter(a=>cat==='Indo Pop'?['Tulus','Juicy Luicy'].includes(a.name):cat==='Chill'?['Nadin Amizah','Tulus'].includes(a.name):cat==='Indie'?['Hindia','Nadin Amizah'].includes(a.name):['Dewa 19','Sheila On 7'].includes(a.name)).map(a=>`<article class="artist-tile" onclick="openArtist('${esc(a.name)}')"><img src="${esc(a.img)}"><strong>${esc(a.name)}</strong><span class="page-sub">${esc(a.genre)}</span></article>`).join('')}</div>`;navigate('Category')}});
-$('#openPlayer').onclick=openNowPlaying;$('#openPlayer').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNowPlaying}};
-$('#miniToggle').onclick=e=>{e.stopPropagation();togglePlayback()};$('#miniStop').onclick=e=>{e.stopPropagation();stopPlayback()};
-$('#closeNowPlaying').onclick=closeNowPlaying;$('#stopPlayback').onclick=stopPlayback;
-$('#npToggle').onclick=togglePlayback;$('#npPrev').onclick=()=>playQueue(-1);$('#npNext').onclick=()=>playQueue(1);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ytPlayer&&playerReady)updatePlayerButtons(ytPlayer.getPlayerState())});
-window.addEventListener('popstate',()=>{const name=location.hash.replace('#','')||'Home';if(['Home','Search','Library','Offline','Liked','Profile','Artists'].includes(name))navigate(name)});
-function route(name){history.pushState({name},'',`#${name}`);navigate(name)}
-renderHome();if(location.hash){const n=location.hash.slice(1);if(['Home','Search','Library','Offline','Liked','Profile','Artists'].includes(n))navigate(n)}
+const ls={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const IMG='https://images.unsplash.com/photo-';
+const ARTISTS=[
+ {name:'Tulus',genre:'Pop',bio:'Penyanyi dan penulis lagu Indonesia dengan vokal hangat dan lirik yang dekat dengan keseharian.',img:IMG+'1516280440614-37939bbacd81?w=900'},
+ {name:'Hindia',genre:'Alternative / Indie',bio:'Proyek musik Baskara Putra: lirik reflektif dan warna alternative pop Indonesia.',img:IMG+'1493225457124-a3eb161ffa5f?w=900'},
+ {name:'Nadin Amizah',genre:'Indie Pop',bio:'Folk-pop dengan lirik puitis dan atmosfer intim.',img:IMG+'1511379938547-c1f69419868d?w=900'},
+ {name:'Juicy Luicy',genre:'Pop',bio:'Grup pop dengan lagu bernuansa patah hati dan cerita sehari-hari.',img:IMG+'1516450360452-9312f5e86fc7?w=900'},
+ {name:'Dewa 19',genre:'Rock',bio:'Grup legendaris dengan katalog pop-rock lintas generasi.',img:IMG+'1501386761578-eac5c94b800a?w=900'},
+ {name:'Sheila On 7',genre:'Pop Rock',bio:'Band pop-rock asal Yogyakarta dengan lagu yang melekat di pendengar Indonesia.',img:IMG+'1470229722913-7c0e2dbbafd3?w=900'}];
+const PLAYLISTS=[
+ {name:'Top Indo Pop',desc:'Lagu Indonesia pilihan untuk menemani harimu.',img:IMG+'1493225457124-a3eb161ffa5f?w=600',artists:['Tulus','Hindia','Nadin Amizah','Juicy Luicy']},
+ {name:'Senja & Sore',desc:'Musik santai untuk perjalanan pulang.',img:IMG+'1470252649378-9c29740c9fa8?w=600',artists:['Nadin Amizah','Hindia','Tulus']},
+ {name:'Indie Indonesia',desc:'Warna alternatif musisi independen.',img:IMG+'1516280440614-37939bbacd81?w=600',artists:['Hindia','Nadin Amizah']},
+ {name:'Throwback',desc:'Lagu lintas generasi.',img:IMG+'1501386761578-eac5c94b800a?w=600',artists:['Dewa 19','Sheila On 7']}];
+const NAV=[['home','Home','⌂'],['search','Search','⌕'],['library','Library','▥'],['offline','Offline','⇩'],['liked','Liked','♡'],['profile','Profile','♙']];
+const TR={}, mem=new Map();
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2000)};
+const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- API ---------- */
+async function api(p){const key=JSON.stringify(p);if(mem.has(key))return mem.get(key);
+ const u=new URL('/api/search',location.origin);for(const[k,v]of Object.entries(p))if(v)u.searchParams.set(k,v);
+ let r,d={};try{r=await fetch(u);d=await r.json()}catch{throw Object.assign(new Error('Tidak bisa terhubung ke server.'),{code:'NETWORK'})}
+ if(!r.ok)throw Object.assign(new Error(d.error||'Pencarian gagal'),{code:d.code});
+ d.items.forEach(t=>TR[t.id]=t);mem.set(key,d);return d}
+
+/* ---------- Player (provider adapter) ---------- */
+// Antarmuka provider: load(id) play() pause() seek(s) vol(0-100) time() dur().
+// Provider audio berlisensi dapat menggantikan objek ini tanpa mengubah UI.
+const Provider={ready:null,p:null,
+ init(){return this.ready||(this.ready=new Promise((ok,no)=>{const to=setTimeout(()=>{this.ready=null;no(new Error('Pemutar YouTube gagal dimuat'))},9000);
+  window.onYouTubeIframeAPIReady=()=>{this.p=new YT.Player('ytplayer',{width:240,height:135,playerVars:{playsinline:1,rel:0,fs:0,modestbranding:1,origin:location.origin},
+   events:{onReady:()=>{clearTimeout(to);this.p.setVolume(+$('#vol').value);ok()},onStateChange:e=>Player.onState(e.data),onError:()=>Player.onError()}})};
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{clearTimeout(to);this.ready=null;no(new Error('Pemutar YouTube diblokir'))};document.head.appendChild(s)}))},
+ async load(id){await this.init();this.p.loadVideoById(id)},
+ play(){this.p?.playVideo()},pause(){this.p?.pauseVideo()},seek(t){this.p?.seekTo(t,true)},vol(v){this.p?.setVolume(v)},
+ time(){return this.p?.getCurrentTime?.()||0},dur(){return this.p?.getDuration?.()||0}};
+const Player={queue:[],i:-1,shuffle:ls.get('w-shuffle',false),repeat:ls.get('w-repeat',0),playing:false,
+ cur(){return this.queue[this.i]},
+ async start(t,list){this.queue=(list&&list.some(x=>x.id===t.id))?list.slice():[t];this.i=this.queue.findIndex(x=>x.id===t.id);await this.load()},
+ async load(){const t=this.cur();if(!t)return;this.ui(t);try{await Provider.load(t.id)}catch(e){toast(e.message)}},
+ onState(s){this.playing=s===1||s===3;if(s===0)this.next(true);this.sync();if(s===1)this.meta()},
+ onError(){toast('Video tidak bisa diputar, lanjut ke lagu berikutnya.');this.next(true)},
+ next(auto){if(!this.queue.length)return;if(auto&&this.repeat===2){Provider.seek(0);Provider.play();return}
+  let n=this.i+1;if(this.shuffle&&this.queue.length>1){do n=Math.floor(Math.random()*this.queue.length);while(n===this.i)}
+  if(n>=this.queue.length){if(this.repeat===1||!auto)n=0;else{this.playing=false;this.sync();return}}this.i=n;this.load()},
+ prev(){if(Provider.time()>3){Provider.seek(0);return}this.i=(this.i-1+this.queue.length)%this.queue.length;this.load()},
+ toggle(){this.playing?Provider.pause():Provider.play()},
+ stop(){Provider.pause();this.queue=[];this.i=-1;this.playing=false;$('#playerbar').classList.remove('show');$('#nowPlaying').classList.remove('open');
+  if('mediaSession'in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}},
+ ui(t){$('#playerbar').classList.add('show');for(const[a,b]of[['#miniTitle','title'],['#npTitle','title'],['#miniArtist','channel'],['#npArtist','channel']])$(a).textContent=t[b];
+  $('#miniImg').src=$('#npArtwork').src=t.thumb||'';$('#nowPlaying').style.setProperty('--np-bg',t.thumb?`url("${t.thumb}")`:'none');
+  document.querySelectorAll('.track-row').forEach(r=>r.classList.toggle('playing',r.dataset.id===t.id));this.queueUi();this.sync()},
+ sync(){const g=this.playing?'Ⅱ':'▶';$('#miniToggle').textContent=$('#npToggle').textContent=g;
+  $('#npShuffle').classList.toggle('on',this.shuffle);$('#npRepeat').classList.toggle('on',this.repeat>0);$('#npRepeat').textContent=this.repeat===2?'↻1':'↻';
+  if('mediaSession'in navigator)navigator.mediaSession.playbackState=this.playing?'playing':'paused'},
+ queueUi(){$('#queueList').innerHTML=this.queue.map((t,k)=>`<div class="track-row ${k===this.i?'playing':''}" data-q="${k}"><img src="${esc(t.thumb)}" alt=""><div class="track-info"><strong>${esc(t.title)}</strong><span>${esc(t.channel)}</span></div></div>`).join('')},
+ meta(){const t=this.cur();if(!t||!('mediaSession'in navigator))return;const ms=navigator.mediaSession;
+  ms.metadata=new MediaMetadata({title:t.title,artist:t.channel,album:'Wilify',artwork:t.thumb?[{src:t.thumb,sizes:'480x360',type:'image/jpeg'}]:[]});
+  for(const[a,f]of[['play',()=>Provider.play()],['pause',()=>Provider.pause()],['previoustrack',()=>this.prev()],['nexttrack',()=>this.next()],['seekto',e=>Provider.seek(e.seekTime)]])try{ms.setActionHandler(a,f)}catch{}}};
+setInterval(()=>{const d=Provider.dur(),c=Provider.time();if(!d||!Player.cur())return;
+ $('#miniProg').style.width=(c/d*100)+'%';if(!seeking){$('#seek').value=c/d*100}$('#tCur').textContent=fmt(c);$('#tDur').textContent=fmt(d);
+ if(Player.playing&&'mediaSession'in navigator&&navigator.mediaSession.setPositionState)try{navigator.mediaSession.setPositionState({duration:d,position:Math.min(c,d),playbackRate:1})}catch{}},500);
+let seeking=false;
+$('#seek').oninput=()=>{seeking=true;$('#tCur').textContent=fmt($('#seek').value/100*Provider.dur())};
+$('#seek').onchange=()=>{Provider.seek($('#seek').value/100*Provider.dur());seeking=false};
+$('#vol').oninput=e=>{Provider.vol(+e.target.value);ls.set('w-vol',+e.target.value)};$('#vol').value=ls.get('w-vol',80);
+$('#npToggle').onclick=$('#miniToggle').onclick=e=>{e.stopPropagation();Player.toggle()};
+$('#npNext').onclick=$('#miniNext').onclick=e=>{e.stopPropagation();Player.next()};
+$('#npPrev').onclick=$('#miniPrev').onclick=e=>{e.stopPropagation();Player.prev()};
+$('#npShuffle').onclick=()=>{Player.shuffle=!Player.shuffle;ls.set('w-shuffle',Player.shuffle);Player.sync()};
+$('#npRepeat').onclick=()=>{Player.repeat=(Player.repeat+1)%3;ls.set('w-repeat',Player.repeat);Player.sync()};
+$('#miniStop').onclick=$('#npStop').onclick=e=>{e.stopPropagation();Player.stop()};
+$('#npClose').onclick=()=>$('#nowPlaying').classList.remove('open');
+$('#openPlayer').onclick=()=>Player.cur()&&$('#nowPlaying').classList.add('open');
+$('#queueList').onclick=e=>{const r=e.target.closest('[data-q]');if(r){Player.i=+r.dataset.q;Player.load()}};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Player.cur()){try{Player.playing=Provider.p.getPlayerState()===1}catch{}Player.sync()}});
+
+/* ---------- Komponen ---------- */
+const liked=()=>ls.get('w-liked',[]);
+const row=t=>{TR[t.id]=t;return `<div class="track-row ${Player.cur()?.id===t.id?'playing':''}" data-id="${esc(t.id)}"><img src="${esc(t.thumb)}" alt="" loading="lazy"><div class="track-info"><strong>${esc(t.title)}</strong><span>${esc(t.channel)}</span></div><button class="like-btn" data-like="${esc(t.id)}" aria-label="Sukai">${liked().some(x=>x.id===t.id)?'♥':'♡'}</button><span class="track-play">▶</span></div>`};
+const skel=n=>Array.from({length:n},()=>'<div class="skel"></div>').join('');
+const fail=(e,retry)=>`<div class="empty-state err">${esc(e.code==='QUOTA'?'Kuota katalog hari ini habis. Coba lagi nanti.':e.message)}<br><button class="retry" onclick="${retry}">Coba lagi</button></div>`;
+const head=(t,sub,back=true)=>`<div class="page-head">${back?'<button class="back-btn" onclick="history.back()" aria-label="Kembali">‹</button>':''}<div><h1 class="page-title">${esc(t)}</h1><p class="page-sub">${esc(sub)}</p></div></div>`;
+document.addEventListener('click',e=>{
+ const lk=e.target.closest('[data-like]');if(lk){e.stopPropagation();const id=lk.dataset.like;let a=liked();const i=a.findIndex(x=>x.id===id);
+  if(i>=0){a.splice(i,1);toast('Dihapus dari Liked Songs')}else{a.unshift(TR[id]);toast('Ditambahkan ke Liked Songs')}ls.set('w-liked',a.filter(Boolean));if(location.hash==='#/liked')return render();lk.textContent=i>=0?'♡':'♥';return}
+ const r=e.target.closest('#page .track-row[data-id]');if(r){const list=[...r.parentElement.querySelectorAll('.track-row[data-id]')].map(x=>TR[x.dataset.id]).filter(Boolean);Player.start(TR[r.dataset.id],list)}});
+
+/* ---------- Halaman ---------- */
+const V={
+ async home(){return `<div class="section"><div class="section-head"><h2>◉ Popular Playlists</h2></div><div class="rail">${PLAYLISTS.map(p=>`<article class="album" onclick="location.hash='#/playlist/${encodeURIComponent(p.name)}'"><img src="${esc(p.img)}" alt=""><strong>${esc(p.name)}</strong><span>${esc(p.desc)}</span></article>`).join('')}</div></div>
+ <div class="section"><div class="section-head"><h2>♧ Top Artists</h2></div><div class="rail">${ARTISTS.map(a=>`<article class="artist" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'"><img src="${esc(a.img)}" alt=""><strong>${esc(a.name)}</strong></article>`).join('')}</div></div>`},
+ async search(q){const hit=ARTISTS.find(a=>q&&a.name.toLowerCase()===q.toLowerCase());
+  const box=head('Search','Temukan lagu dan artis.',false)+`<form class="search-panel" id="sf"><input id="sq" value="${esc(q||'')}" placeholder="Apa yang ingin kamu dengarkan?" enterkeyhint="search"><button>Cari</button></form><div id="sr"></div>`;
+  setTimeout(()=>{$('#sf').onsubmit=e=>{e.preventDefault();location.hash='#/search/'+encodeURIComponent($('#sq').value.trim())};if(!q)return $('#sr').innerHTML='<div class="empty-state">Cari musik Indonesia dan temukan sesuatu yang baru.</div>';
+   if(hit)$('#sr').innerHTML=`<div class="chips"><button class="action-glass" onclick="location.hash='#/artist/${encodeURIComponent(hit.name)}'">Buka halaman artis ${esc(hit.name)} ›</button></div>`;
+   $('#sr').insertAdjacentHTML('beforeend',skel(5));const run=async()=>{try{const d=await api({q});$('#sr').querySelectorAll('.skel,.empty-state').forEach(x=>x.remove());
+    $('#sr').insertAdjacentHTML('beforeend',d.items.length?`<div class="track-list">${d.items.map(row).join('')}</div>`:'<div class="empty-state">Tidak ada hasil untuk “'+esc(q)+'”.</div>')}catch(e){$('#sr').innerHTML=fail(e,'render()')}};run()},0);return box},
+ async artist(name){const a=ARTISTS.find(x=>x.name===name)||{name,genre:'Musisi Indonesia',bio:'Lagu dan rilisan dari '+name+'.',img:ARTISTS[1].img};
+  const rel=ARTISTS.filter(x=>x.name!==a.name).sort((x,y)=>(y.genre===a.genre)-(x.genre===a.genre)).slice(0,4);
+  setTimeout(()=>artistTracks(a.name),0);
+  return `${head(a.name,'Artist profile')}<div class="artist-hero" style="background-image:url('${esc(a.img)}')"><div><div class="eyebrow">ARTIST</div><h1>${esc(a.name)}</h1><p>${esc(a.genre)} · Indonesia</p><div class="artist-actions"><button class="action-primary" id="aPlay">▶ Putar</button><button class="action-glass" onclick="saveArtist('${esc(a.name)}')">＋ Simpan</button></div></div></div>
+  <p style="color:#c5c5ce;font-size:13px;line-height:1.7;max-width:680px">${esc(a.bio)}</p>
+  <section class="section"><div class="section-head"><h2>Lagu populer</h2></div><div class="track-list" id="pop">${skel(5)}</div></section>
+  <section class="section"><div class="section-head"><h2>Semua lagu</h2></div><div class="track-list" id="all"></div><div id="more"></div></section>
+  <section class="section"><div class="section-head"><h2>Albums &amp; Singles</h2></div><div class="empty-state">Pengelompokan album/single memerlukan sumber metadata rilisan yang belum terhubung.</div></section>
+  <section class="section"><div class="section-head"><h2>Related artists</h2></div><div class="rail">${rel.map(r=>`<article class="artist" onclick="location.hash='#/artist/${encodeURIComponent(r.name)}'"><img src="${esc(r.img)}" alt=""><strong>${esc(r.name)}</strong></article>`).join('')}</div></section>`},
+ async playlist(name){const p=PLAYLISTS.find(x=>x.name===name);if(!p)return head('Playlist tidak ditemukan','')+'<div class="empty-state">Playlist tidak ada.</div>';
+  setTimeout(async()=>{try{const rs=await Promise.all(p.artists.map(n=>api({artist:n})));const items=rs.map(d=>d.items.slice(0,5)).flatMap((l,i,all)=>l).filter((t,i,a)=>a.findIndex(x=>x.id===t.id)===i);
+   $('#pl').innerHTML=items.length?items.map(row).join(''):'<div class="empty-state">Belum ada lagu.</div>';$('#plPlay').onclick=()=>items[0]&&Player.start(items[0],items)}catch(e){$('#pl').innerHTML=fail(e,'render()')}},0);
+  return `${head('Playlist','Wilify collection')}<div class="playlist-hero"><img src="${esc(p.img)}" alt=""><div><div class="eyebrow">PLAYLIST</div><h1>${esc(p.name)}</h1><p>${esc(p.desc)}<br>${p.artists.length} artis</p><button class="action-primary" id="plPlay">▶ Putar</button></div></div><div class="track-list" id="pl">${skel(6)}</div>`},
+ async library(){const sv=ls.get('w-artists',[]);const c=[...PLAYLISTS.map(p=>`<article class="library-card" onclick="location.hash='#/playlist/${encodeURIComponent(p.name)}'"><img src="${esc(p.img)}" alt=""><strong>${esc(p.name)}</strong><span class="page-sub">Playlist</span></article>`),
+  ...ARTISTS.filter(a=>sv.includes(a.name)).map(a=>`<article class="library-card" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'"><img src="${esc(a.img)}" alt=""><strong>${esc(a.name)}</strong><span class="page-sub">Artis tersimpan</span></article>`)];
+  return head('Your Library','Tersimpan di perangkat ini.',false)+`<div class="library-grid">${c.join('')}</div><p class="page-sub" style="margin-top:18px"><a href="#/liked" style="color:#c8b0ff">♥ Liked Songs (${liked().length})</a></p>`},
+ async liked(){const a=liked();return head('Liked Songs','Lagu yang kamu sukai.',false)+(a.length?`<div class="track-list">${a.map(row).join('')}</div>`:'<div class="empty-state">Belum ada lagu yang disukai.<br>Tekan ♡ pada lagu untuk menyimpannya.</div>')},
+ async offline(){return head('Offline','Musik tanpa koneksi.',false)+'<div class="empty-state">Mode offline belum tersedia. Wilify tidak mengunduh atau menyimpan audio YouTube.</div>'},
+ async profile(){return head('Profile','Ruang musik pribadimu.',false)+`<div class="profile-card"><div class="profile-avatar">W</div><h2>Wilify Listener</h2><p style="color:#c2c1cd;font-size:13px">Lagu disukai: ${liked().length} · Artis tersimpan: ${ls.get('w-artists',[]).length}</p><button class="action-glass" onclick="location.hash='#/liked'">Lihat lagu disukai</button></div>`}};
+function saveArtist(n){const a=ls.get('w-artists',[]);if(a.includes(n))return toast('Sudah ada di Library');a.push(n);ls.set('w-artists',a);toast(n+' disimpan ke Library')}
+async function artistTracks(name){let token=null,first=true;
+ const load=async()=>{const more=$('#more');if(!more)return;more.innerHTML=first?'':skel(2);
+  try{const d=await api({artist:name,pageToken:token});token=d.nextPageToken;const list=$('#all');if(!list)return;
+   if(first){first=false;$('#pop').innerHTML=d.items.length?d.items.slice(0,5).map(row).join(''):'<div class="empty-state">Belum ada lagu yang cocok untuk '+esc(name)+'.</div>';$('#aPlay').onclick=()=>d.items[0]?Player.start(d.items[0],d.items):toast('Belum ada lagu')}
+   const have=new Set([...list.querySelectorAll('[data-id]')].map(x=>x.dataset.id));list.insertAdjacentHTML('beforeend',d.items.filter(t=>!have.has(t.id)).map(row).join(''));
+   more.innerHTML=token?'<button class="more" id="mb">Muat lagi</button>':'';if($('#mb'))$('#mb').onclick=load}
+  catch(e){const p=$('#pop');if(first&&p)p.innerHTML=fail(e,'render()');else more.innerHTML=fail(e,'')}};
+ load()}
+let rt=0;
+async function render(){const tk=++rt;const[v,...r]=location.hash.replace(/^#\/?/,'').split('/');const view=V[v]?v:'home',p=decodeURIComponent(r.join('/')||'');
+ const el=$('#page');el.classList.remove('view','active');void el.offsetWidth;el.className='view active';
+ $('#homeHero').style.display=view==='home'?'':'none';
+ document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.nav===(view==='artist'||view==='playlist'?'home':view)));
+ el.innerHTML=`<div class="track-list">${skel(4)}</div>`;const html=await V[view](p);if(tk!==rt)return;el.innerHTML=html;window.scrollTo(0,0)}
+const navHtml=NAV.map(([k,l,i])=>`<button class="navitem" data-nav="${k}" onclick="location.hash='#/${k}'"><b>${i}</b>${l}</button>`).join('');
+$('#bnav').innerHTML=navHtml;$('#side').innerHTML='<button class="logo" onclick="location.hash=\'#/home\'">Wili<span>fy</span></button>'+navHtml;
+addEventListener('hashchange',render);render();
 </script></body></html>
