@@ -240,20 +240,26 @@ async function api(p){const key=JSON.stringify(p);if(mem.has(key))return mem.get
 /* ---------- Player (provider adapter) ---------- */
 // Antarmuka provider: load(id) play() pause() seek(s) vol(0-100) time() dur().
 // Provider audio berlisensi dapat menggantikan objek ini tanpa mengubah UI.
-const Provider={ready:null,p:null,
- init(){return this.ready||(this.ready=new Promise((ok,no)=>{const to=setTimeout(()=>{this.ready=null;no(new Error('Pemutar YouTube gagal dimuat'))},9000);
-  window.onYouTubeIframeAPIReady=()=>{this.p=new YT.Player('ytplayer',{width:240,height:135,playerVars:{playsinline:1,rel:0,fs:0,modestbranding:1,origin:location.origin},
-   events:{onReady:()=>{clearTimeout(to);this.p.setVolume(+$('#vol').value);ok()},onStateChange:e=>Player.onState(e.data),onError:()=>Player.onError()}})};
-  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{clearTimeout(to);this.ready=null;no(new Error('Pemutar YouTube diblokir'))};document.head.appendChild(s)}))},
+const Provider={p:null,boot:null,
+ init(){if(this.boot)return this.boot;
+  this.boot=new Promise((ok,no)=>{
+   const make=()=>{if(this.p)return;try{this.p=new YT.Player('ytplayer',{width:240,height:135,playerVars:{playsinline:1,rel:0,fs:0,modestbranding:1},
+    events:{onReady:()=>{this.p.setVolume(+$('#vol').value);ok()},onStateChange:e=>Player.onState(e.data),onError:e=>Player.onError(e.data)}})}catch(e){this.boot=null;no(e)}};
+   if(window.YT&&YT.Player)return make();
+   const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{prev&&prev();make()};
+   const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';
+   sc.onerror=()=>{this.boot=null;sc.remove();no(new Error('Skrip pemutar YouTube diblokir jaringan/ad-blocker'))};document.head.appendChild(sc);
+   setTimeout(()=>{if(!this.p||!this.p.loadVideoById){this.boot=null;no(new Error('Pemutar YouTube tidak merespons. Coba lagi.'))}},15000)});
+  return this.boot},
  async load(id){await this.init();this.p.loadVideoById(id)},
- play(){this.p?.playVideo()},pause(){this.p?.pauseVideo()},seek(t){this.p?.seekTo(t,true)},vol(v){this.p?.setVolume(v)},
+ play(){this.p?.playVideo?.()},pause(){this.p?.pauseVideo?.()},seek(t){this.p?.seekTo?.(t,true)},vol(v){this.p?.setVolume?.(v)},
  time(){return this.p?.getCurrentTime?.()||0},dur(){return this.p?.getDuration?.()||0}};
 const Player={queue:[],i:-1,shuffle:ls.get('w-shuffle',false),repeat:ls.get('w-repeat',0),playing:false,
  cur(){return this.queue[this.i]},
  async start(t,list){this.queue=(list&&list.some(x=>x.id===t.id))?list.slice():[t];this.i=this.queue.findIndex(x=>x.id===t.id);await this.load()},
  async load(){const t=this.cur();if(!t)return;this.ui(t);try{await Provider.load(t.id)}catch(e){toast(e.message)}},
- onState(s){this.playing=s===1||s===3;if(s===0)this.next(true);this.sync();if(s===1)this.meta()},
- onError(){toast('Video tidak bisa diputar, lanjut ke lagu berikutnya.');this.next(true)},
+ onState(s){if(s===1)this.errs=0;this.playing=s===1||s===3;if(s===0)this.next(true);this.sync();if(s===1)this.meta()},
+ errs:0,onError(c){if(++this.errs>3){toast('Beberapa video berturut-turut gagal (kode '+c+'). Coba lagu lain.');return}toast('Video tidak bisa diputar (kode '+c+'), lanjut...');this.next(true)},
  next(auto){if(!this.queue.length)return;if(auto&&this.repeat===2){Provider.seek(0);Provider.play();return}
   let n=this.i+1;if(this.shuffle&&this.queue.length>1){do n=Math.floor(Math.random()*this.queue.length);while(n===this.i)}
   if(n>=this.queue.length){if(this.repeat===1||!auto)n=0;else{this.playing=false;this.sync();return}}this.i=n;this.load()},
