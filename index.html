@@ -232,7 +232,8 @@ const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(
 /* ---------- API ---------- */
 async function api(p){const key=JSON.stringify(p);if(mem.has(key))return mem.get(key);
  const u=new URL('/api/search',location.origin);for(const[k,v]of Object.entries(p))if(v)u.searchParams.set(k,v);
- let r,d={};try{r=await fetch(u);d=await r.json()}catch{throw Object.assign(new Error('Tidak bisa terhubung ke server.'),{code:'NETWORK'})}
+ let r,d;try{r=await fetch(u)}catch{throw Object.assign(new Error('Tidak ada koneksi internet.'),{code:'NETWORK'})}
+ try{d=await r.json()}catch{throw Object.assign(new Error(r.status===404?'Endpoint /api/search tidak ditemukan (HTTP 404). File harus ada di api/search.js di root repo.':`Fungsi /api/search error (HTTP ${r.status}). Cek Vercel → Logs; pastikan folder api/_lib ikut ter-upload.`),{code:'NOAPI'})}
  if(!r.ok)throw Object.assign(new Error(d.error||'Pencarian gagal'),{code:d.code});
  d.items.forEach(t=>TR[t.id]=t);mem.set(key,d);return d}
 
