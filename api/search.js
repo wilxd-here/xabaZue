@@ -42,10 +42,12 @@ function dedupeKey(track, artist) {
   return k.replace(/\s+/g, " ").trim();
 }
 
-function rank(items, artist) {
+function rank(items, artist, q = "") {
+  const qt = artist ? [] : norm(q).split(" ").filter(Boolean);
   const best = new Map();
   for (const t of items) {
     if (!t.id) continue;
+    if (qt.length && !qt.every(w => hasWords(norm(t.title + " " + t.channel), w))) continue;
     const score = scoreItem(t, artist);
     if (score < 0) continue;
     const k = dedupeKey(t, artist) || t.id;
@@ -97,9 +99,9 @@ export default async function handler(req, res) {
         maxResults: "50", regionCode: "ID", q: query, ...(token ? { pageToken: token } : {}) }, key);
       collected.push(...(d.items || []).map(simplify));
       next = d.nextPageToken || null; token = next;
-      if (!next || rank(collected, artist).length >= 12) break;
+      if (!next || rank(collected, artist, q).length >= 12) break;
     }
-    const value = { items: rank(collected, artist).slice(0, 30), artist: artist || null, nextPageToken: next };
+    const value = { items: rank(collected, artist, q).slice(0, 30), artist: artist || null, nextPageToken: next };
     cache.set(ck, { t: Date.now(), v: value });
     if (cache.size > 200) cache.delete(cache.keys().next().value);
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
